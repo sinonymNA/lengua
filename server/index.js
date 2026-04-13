@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3000
 app.use(express.json())
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL || '*',
     credentials: true,
   })
 )
@@ -49,6 +49,11 @@ app.use('/api/session', sessionRoutes)
 app.use('/api/vocab', vocabRoutes)
 app.use('/api/speech', speechRoutes)
 
+// Health check — must be before the SPA wildcard
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
 // Serve static frontend in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'public')))
@@ -56,11 +61,6 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, 'public', 'index.html'))
   })
 }
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() })
-})
 
 // Error handler
 app.use((err, req, res, next) => {

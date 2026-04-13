@@ -28,6 +28,7 @@ RUN apk add --no-cache python3 make g++
 
 COPY package.json ./
 COPY server/package.json ./server/
+COPY client/package.json ./client/
 COPY shared/ ./shared/
 
 RUN npm install --workspace=server --omit=dev
