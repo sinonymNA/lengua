@@ -1,25 +1,41 @@
-FROM node:20-alpine AS base
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Install dependencies
+# Copy all package manifests so npm can resolve workspaces
 COPY package.json ./
 COPY server/package.json ./server/
 COPY client/package.json ./client/
 
-RUN npm install --workspace=server
-RUN npm install --workspace=client
+# Single root install wires up both workspaces
+RUN npm install
 
-# Build client
-COPY client/ ./client/
-RUN npm run build --workspace=client
+# ---- Build client ----
+FROM deps AS build
+WORKDIR /app
 
-# Copy server
-COPY server/ ./server/
+# Copy full source
+COPY . .
+
+# Vite builds into server/public
+RUN cd client && npm run build
+
+# ---- Production image ----
+FROM node:20-alpine AS production
+WORKDIR /app
+
+# Only copy what the server needs at runtime
+COPY package.json ./
+COPY server/package.json ./server/
 COPY shared/ ./shared/
 
-# Expose port
-EXPOSE 3000
+# Install server deps only (no devDeps, no client)
+RUN npm install --workspace=server --omit=dev
 
-# Start server
+# Copy server source and the built client assets
+COPY server/ ./server/
+COPY --from=build /app/server/public ./server/public
+
+EXPOSE 3000
 ENV NODE_ENV=production
+
 CMD ["node", "server/index.js"]
