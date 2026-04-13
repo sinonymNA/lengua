@@ -1,39 +1,29 @@
 import express from 'express'
 import { requireAuth } from '../middleware/auth.js'
-import { createClient } from '@supabase/supabase-js'
 import { CITIES } from '../../shared/constants.js'
-import { readdir, readFile } from 'fs/promises'
+import { sessionQueries } from '../db.js'
+import { readFile } from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const router = express.Router()
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-function adminClient() {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
-}
-
 async function loadEpisodeSkeleton(city, episode) {
-  const filePath = path.join(
-    __dirname,
-    '../data/episodes',
-    `${city}_${episode}.json`
-  )
+  const citySlug = city.replace(/-/g, '_')
+  const filePath = path.join(__dirname, '../data/episodes', `${citySlug}_${episode}.json`)
   try {
-    const content = await readFile(filePath, 'utf-8')
-    return JSON.parse(content)
+    return JSON.parse(await readFile(filePath, 'utf-8'))
   } catch {
     return null
   }
 }
 
 // GET /api/cities
-router.get('/', async (req, res) => {
-  res.json(CITIES)
-})
+router.get('/', (_req, res) => res.json(CITIES))
 
 // GET /api/cities/:slug
-router.get('/:slug', async (req, res) => {
+router.get('/:slug', (req, res) => {
   const city = CITIES.find((c) => c.slug === req.params.slug)
   if (!city) return res.status(404).json({ error: 'City not found' })
   res.json(city)
@@ -44,10 +34,9 @@ router.get('/:slug/episodes', requireAuth, async (req, res) => {
   const city = CITIES.find((c) => c.slug === req.params.slug)
   if (!city) return res.status(404).json({ error: 'City not found' })
 
-  const citySlug = req.params.slug.replace('-', '_')
   const episodes = []
   for (let i = 1; i <= city.episodes; i++) {
-    const skeleton = await loadEpisodeSkeleton(citySlug, i)
+    const skeleton = await loadEpisodeSkeleton(city.slug, i)
     if (skeleton) {
       episodes.push({
         number: i,
@@ -60,31 +49,16 @@ router.get('/:slug/episodes', requireAuth, async (req, res) => {
     }
   }
 
-  // Get user completion data
-  const { data: sessions } = await adminClient()
-    .from('sessions')
-    .select('episode, completed')
-    .eq('user_id', req.user.id)
-    .eq('city', req.params.slug)
+  const completed = sessionQueries.findCompleted.all(req.user.id, req.params.slug)
+  const completedNums = new Set(completed.map((s) => s.episode))
 
-  const completedEpisodes = new Set(
-    (sessions || []).filter((s) => s.completed).map((s) => s.episode)
-  )
-
-  const result = episodes.map((ep) => ({
-    ...ep,
-    completed: completedEpisodes.has(ep.number),
-  }))
-
-  res.json(result)
+  res.json(episodes.map((ep) => ({ ...ep, completed: completedNums.has(ep.number) })))
 })
 
 // GET /api/cities/:slug/episodes/:num
 router.get('/:slug/episodes/:num', requireAuth, async (req, res) => {
-  const citySlug = req.params.slug.replace('-', '_')
-  const skeleton = await loadEpisodeSkeleton(citySlug, parseInt(req.params.num))
+  const skeleton = await loadEpisodeSkeleton(req.params.slug, parseInt(req.params.num))
   if (!skeleton) return res.status(404).json({ error: 'Episode not found' })
-
   res.json(skeleton)
 })
 

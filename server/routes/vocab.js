@@ -1,90 +1,41 @@
 import express from 'express'
 import { requireAuth } from '../middleware/auth.js'
-import { createClient } from '@supabase/supabase-js'
+import { wordQueries, generateId } from '../db.js'
 
 const router = express.Router()
 
-function adminClient() {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
+function getStatus(confidence) {
+  if (confidence >= 80) return 'acquired'
+  if (confidence >= 40) return 'frontier'
+  return 'unknown'
 }
 
-// GET /api/vocab — user's full vocab graph
-router.get('/', requireAuth, async (req, res) => {
+// GET /api/vocab
+router.get('/', requireAuth, (req, res) => {
   const { city } = req.query
-  let query = adminClient()
-    .from('words')
-    .select('*')
-    .eq('user_id', req.user.id)
-    .order('last_seen', { ascending: false })
-
-  if (city) {
-    query = query.eq('city', city)
-  }
-
-  const { data, error } = await query
-  if (error) return res.status(500).json({ error: error.message })
-
-  res.json(data || [])
+  const words = city
+    ? wordQueries.findByCity.all(req.user.id, city)
+    : wordQueries.findAll.all(req.user.id)
+  res.json(words)
 })
 
-// POST /api/vocab/encounter — log word encounter
-router.post('/encounter', requireAuth, async (req, res) => {
+// POST /api/vocab/encounter
+router.post('/encounter', requireAuth, (req, res) => {
   const { word, translation, city } = req.body
   if (!word) return res.status(400).json({ error: 'word is required' })
 
-  const db = adminClient()
-
-  // Check if word exists
-  const { data: existing } = await db
-    .from('words')
-    .select('*')
-    .eq('user_id', req.user.id)
-    .eq('word', word.toLowerCase())
-    .single()
+  const wordLower = word.toLowerCase().trim()
+  const existing = wordQueries.findByWord.get(req.user.id, wordLower)
 
   if (existing) {
-    const newConfidence = Math.min(100, existing.confidence + 5)
-    const newStatus =
-      newConfidence >= 80
-        ? 'acquired'
-        : newConfidence >= 40
-        ? 'frontier'
-        : 'unknown'
-
-    const { data, error } = await db
-      .from('words')
-      .update({
-        confidence: newConfidence,
-        encounters: existing.encounters + 1,
-        last_seen: new Date().toISOString(),
-        status: newStatus,
-      })
-      .eq('id', existing.id)
-      .select()
-      .single()
-
-    if (error) return res.status(500).json({ error: error.message })
-    return res.json(data)
+    const newConf = Math.min(100, existing.confidence + 5)
+    wordQueries.update.run(newConf, getStatus(newConf), existing.id)
+    return res.json(wordQueries.findByWord.get(req.user.id, wordLower))
   }
 
-  // Insert new word
-  const { data, error } = await db
-    .from('words')
-    .insert({
-      user_id: req.user.id,
-      word: word.toLowerCase(),
-      translation: translation || '',
-      city: city || '',
-      confidence: 5,
-      encounters: 1,
-      last_seen: new Date().toISOString(),
-      status: 'unknown',
-    })
-    .select()
-    .single()
-
-  if (error) return res.status(500).json({ error: error.message })
-  res.json(data)
+  const id = generateId()
+  wordQueries.insert.run(id, req.user.id, wordLower, translation || '', city || '', 5, getStatus(5))
+  res.json(wordQueries.findByWord.get(req.user.id, wordLower))
 })
 
 export default router

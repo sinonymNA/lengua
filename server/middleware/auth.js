@@ -1,26 +1,30 @@
-import { createClient } from '@supabase/supabase-js'
+import jwt from 'jsonwebtoken'
+import { userQueries } from '../db.js'
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
+function jwtSecret() {
+  const secret = process.env.JWT_SECRET
+  if (!secret) throw new Error('JWT_SECRET environment variable is not set')
+  return secret
+}
 
-export async function requireAuth(req, res, next) {
+export function signToken(userId) {
+  return jwt.sign({ sub: userId }, jwtSecret(), { expiresIn: '30d' })
+}
+
+export function requireAuth(req, res, next) {
   const authHeader = req.headers.authorization
   if (!authHeader?.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
   const token = authHeader.slice(7)
-  const { data, error } = await supabase.auth.getUser(token)
-
-  if (error || !data.user) {
+  try {
+    const payload = jwt.verify(token, jwtSecret())
+    const user = userQueries.findById.get(payload.sub)
+    if (!user) return res.status(401).json({ error: 'User not found' })
+    req.user = user
+    next()
+  } catch {
     return res.status(401).json({ error: 'Invalid or expired token' })
   }
-
-  req.user = data.user
-  req.supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  })
-  next()
 }

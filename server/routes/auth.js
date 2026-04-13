@@ -1,11 +1,9 @@
 import express from 'express'
-import { createClient } from '@supabase/supabase-js'
+import bcrypt from 'bcryptjs'
+import { userQueries, profileQueries, generateId } from '../db.js'
+import { signToken } from '../middleware/auth.js'
 
 const router = express.Router()
-
-function getSupabase() {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
-}
 
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
@@ -13,29 +11,23 @@ router.post('/signup', async (req, res) => {
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' })
   }
-
-  const supabase = getSupabase()
-  const { data, error } = await supabase.auth.signUp({ email, password })
-
-  if (error) return res.status(400).json({ error: error.message })
-
-  // Create user profile
-  if (data.user) {
-    const adminClient = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    )
-    await adminClient.from('user_profiles').insert({
-      id: data.user.id,
-      email: data.user.email,
-      current_stage: 'el_desconocido',
-      current_city: 'madrid',
-      current_episode: 1,
-      total_sessions: 0,
-    })
+  if (password.length < 8) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters' })
   }
 
-  res.json({ user: data.user, session: data.session })
+  const existing = userQueries.findByEmail.get(email.toLowerCase())
+  if (existing) {
+    return res.status(400).json({ error: 'An account with this email already exists' })
+  }
+
+  const id = generateId()
+  const password_hash = await bcrypt.hash(password, 10)
+
+  userQueries.insert.run(id, email.toLowerCase(), password_hash)
+  profileQueries.insert.run(id)
+
+  const token = signToken(id)
+  res.json({ token, user: { id, email: email.toLowerCase() } })
 })
 
 // POST /api/auth/login
@@ -45,26 +37,23 @@ router.post('/login', async (req, res) => {
     return res.status(400).json({ error: 'Email and password are required' })
   }
 
-  const supabase = getSupabase()
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
-  if (error) return res.status(401).json({ error: error.message })
-
-  res.json({ user: data.user, session: data.session })
-})
-
-// POST /api/auth/logout
-router.post('/logout', async (req, res) => {
-  const authHeader = req.headers.authorization
-  if (!authHeader?.startsWith('Bearer ')) {
-    return res.status(200).json({ message: 'Logged out' })
+  const user = userQueries.findByEmail.get(email.toLowerCase())
+  if (!user) {
+    return res.status(401).json({ error: 'Invalid email or password' })
   }
 
-  const supabase = getSupabase()
-  const { error } = await supabase.auth.signOut()
-  if (error) return res.status(400).json({ error: error.message })
+  const valid = await bcrypt.compare(password, user.password_hash)
+  if (!valid) {
+    return res.status(401).json({ error: 'Invalid email or password' })
+  }
 
-  res.json({ message: 'Logged out successfully' })
+  const token = signToken(user.id)
+  res.json({ token, user: { id: user.id, email: user.email } })
+})
+
+// POST /api/auth/logout  (client just drops the token — this is a no-op)
+router.post('/logout', (_req, res) => {
+  res.json({ message: 'Logged out' })
 })
 
 export default router

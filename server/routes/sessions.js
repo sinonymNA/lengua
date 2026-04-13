@@ -1,8 +1,8 @@
 import express from 'express'
 import { requireAuth } from '../middleware/auth.js'
-import { createClient } from '@supabase/supabase-js'
 import { generateScene, evaluateFreeResponse, generateOnboardingScene } from '../services/claude.js'
 import { updateVocabAfterScene } from '../services/vocab.js'
+import { profileQueries, sessionQueries, wordQueries, generateId } from '../db.js'
 import { readFile } from 'fs/promises'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -10,106 +10,48 @@ import { fileURLToPath } from 'url'
 const router = express.Router()
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-function adminClient() {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY)
-}
-
 async function loadEpisodeSkeleton(city, episode) {
-  const citySlug = city.replace('-', '_')
-  const filePath = path.join(
-    __dirname,
-    '../data/episodes',
-    `${citySlug}_${episode}.json`
-  )
+  const citySlug = city.replace(/-/g, '_')
+  const filePath = path.join(__dirname, '../data/episodes', `${citySlug}_${episode}.json`)
   try {
-    const content = await readFile(filePath, 'utf-8')
-    return JSON.parse(content)
+    return JSON.parse(await readFile(filePath, 'utf-8'))
   } catch {
     return null
   }
 }
 
 // POST /api/session/start
-router.post('/start', requireAuth, async (req, res) => {
+router.post('/start', requireAuth, (req, res) => {
   const { city, episode } = req.body
-  if (!city || !episode) {
-    return res.status(400).json({ error: 'city and episode are required' })
-  }
+  if (!city || !episode) return res.status(400).json({ error: 'city and episode are required' })
 
-  const db = adminClient()
+  const id = generateId()
+  sessionQueries.insert.run(id, req.user.id, city, episode)
+  profileQueries.incrementSessions.run(req.user.id)
+  profileQueries.updateCity.run(city, episode, req.user.id)
 
-  // Create session record
-  const { data: session, error } = await db
-    .from('sessions')
-    .insert({
-      user_id: req.user.id,
-      city,
-      episode,
-      scene_index: 0,
-      choices_made: [],
-      words_encountered: [],
-      completed: false,
-    })
-    .select()
-    .single()
-
-  if (error) return res.status(500).json({ error: error.message })
-
-  // Update user profile
-  await db
-    .from('user_profiles')
-    .update({
-      current_city: city,
-      current_episode: episode,
-      total_sessions: db.rpc('increment', { row_id: req.user.id }),
-    })
-    .eq('id', req.user.id)
-
-  res.json({ session_id: session.id })
+  res.json({ session_id: id })
 })
 
 // GET /api/session/:id/scene/:n
 router.get('/:id/scene/:n', requireAuth, async (req, res) => {
-  const db = adminClient()
+  const session = sessionQueries.findById.get(req.params.id, req.user.id)
+  if (!session) return res.status(404).json({ error: 'Session not found' })
+
   const sceneIndex = parseInt(req.params.n)
-
-  // Load session
-  const { data: session, error: sessionError } = await db
-    .from('sessions')
-    .select('*')
-    .eq('id', req.params.id)
-    .eq('user_id', req.user.id)
-    .single()
-
-  if (sessionError || !session) {
-    return res.status(404).json({ error: 'Session not found' })
-  }
-
-  // Load user profile for stage
-  const { data: profile } = await db
-    .from('user_profiles')
-    .select('current_stage')
-    .eq('id', req.user.id)
-    .single()
-
-  // Load user vocab
-  const { data: words } = await db
-    .from('words')
-    .select('word, status, confidence')
-    .eq('user_id', req.user.id)
+  const profile = profileQueries.findById.get(req.user.id)
+  const allWords = wordQueries.findAll.all(req.user.id)
 
   const vocab = {
-    acquired: (words || []).filter((w) => w.status === 'acquired').map((w) => w.word),
-    frontier: (words || []).filter((w) => w.status === 'frontier').map((w) => w.word),
+    acquired: allWords.filter((w) => w.status === 'acquired').map((w) => w.word),
+    frontier: allWords.filter((w) => w.status === 'frontier').map((w) => w.word),
   }
 
-  // Load episode skeleton
   const skeleton = await loadEpisodeSkeleton(session.city, session.episode)
-  if (!skeleton) {
-    return res.status(404).json({ error: 'Episode skeleton not found' })
-  }
+  if (!skeleton) return res.status(404).json({ error: 'Episode skeleton not found' })
 
-  const previousScenes = (session.choices_made || [])
+  const choicesMade = JSON.parse(session.choices_made || '[]')
+  const previousScenes = choicesMade
     .filter((c) => c.scene_summary)
     .map((c) => ({ summary: c.scene_summary }))
 
@@ -121,13 +63,7 @@ router.get('/:id/scene/:n', requireAuth, async (req, res) => {
       vocab,
       previousScenes
     )
-
-    // Update session scene_index
-    await db
-      .from('sessions')
-      .update({ scene_index: sceneIndex })
-      .eq('id', session.id)
-
+    sessionQueries.updateScene.run(sceneIndex, session.id)
     res.json(scene)
   } catch (err) {
     console.error('Scene generation error:', err)
@@ -137,37 +73,20 @@ router.get('/:id/scene/:n', requireAuth, async (req, res) => {
 
 // POST /api/session/:id/respond
 router.post('/:id/respond', requireAuth, async (req, res) => {
-  const db = adminClient()
-  const { scene_index, choice_id, free_text, key_words, scene_summary, time_taken } =
-    req.body
-
-  // Load session
-  const { data: session } = await db
-    .from('sessions')
-    .select('*')
-    .eq('id', req.params.id)
-    .eq('user_id', req.user.id)
-    .single()
-
+  const session = sessionQueries.findById.get(req.params.id, req.user.id)
   if (!session) return res.status(404).json({ error: 'Session not found' })
 
-  // Load profile for stage
-  const { data: profile } = await db
-    .from('user_profiles')
-    .select('current_stage')
-    .eq('id', req.user.id)
-    .single()
+  const { scene_index, choice_id, free_text, key_words, scene_summary, time_taken } = req.body
+  const profile = profileQueries.findById.get(req.user.id)
 
   let is_correct = false
   let feedback = null
   let confidence_delta = 0
 
   if (choice_id) {
-    // Multiple choice — correctness determined by the scene data sent from client
     is_correct = req.body.is_correct || false
     confidence_delta = is_correct ? 10 : -5
   } else if (free_text) {
-    // Free speech — evaluate with Claude
     try {
       const evaluation = await evaluateFreeResponse(
         req.body.character_dialogue,
@@ -178,112 +97,74 @@ router.post('/:id/respond', requireAuth, async (req, res) => {
       is_correct = evaluation.understood
       confidence_delta = evaluation.confidence_delta
       feedback = evaluation.feedback
-    } catch (err) {
-      console.error('Evaluation error:', err)
+    } catch {
       is_correct = true
       confidence_delta = 5
-      feedback = 'Could not evaluate response — counting as understood.'
+      feedback = 'Could not evaluate — counting as understood.'
     }
   }
 
-  // Record choice
-  const choices_made = [
-    ...(session.choices_made || []),
-    {
-      scene: scene_index,
-      choice: choice_id || free_text,
-      correct: is_correct,
-      time_taken: time_taken || 0,
-      scene_summary: scene_summary || '',
-    },
-  ]
+  // Append to choices_made
+  const choicesMade = JSON.parse(session.choices_made || '[]')
+  choicesMade.push({
+    scene: scene_index,
+    choice: choice_id || free_text,
+    correct: is_correct,
+    time_taken: time_taken || 0,
+    scene_summary: scene_summary || '',
+  })
 
-  // Update session
-  await db
-    .from('sessions')
-    .update({ choices_made })
-    .eq('id', session.id)
+  // Merge words_encountered (deduplicated)
+  const wordsEncountered = JSON.parse(session.words_encountered || '[]')
+  const newWords = [...new Set([...wordsEncountered, ...(key_words || [])])]
 
-  // Update vocab
+  sessionQueries.updateChoices.run(
+    JSON.stringify(choicesMade),
+    JSON.stringify(newWords),
+    session.id
+  )
+
+  // Update vocab confidence
   if (key_words?.length) {
     await updateVocabAfterScene(req.user.id, key_words, {
       correct: is_correct,
-      hesitation: time_taken > 4000,
+      hesitation: (time_taken || 0) > 4000,
       freeSpeech: !!free_text,
     })
   }
-
-  // Check for words_encountered update
-  const words_encountered = [
-    ...(session.words_encountered || []),
-    ...(key_words || []),
-  ]
-  const unique_words = [...new Set(words_encountered)]
-  await db.from('sessions').update({ words_encountered: unique_words }).eq('id', session.id)
 
   res.json({ is_correct, feedback, confidence_delta })
 })
 
 // POST /api/session/:id/complete
 router.post('/:id/complete', requireAuth, async (req, res) => {
-  const db = adminClient()
-
-  const { data: session } = await db
-    .from('sessions')
-    .select('*')
-    .eq('id', req.params.id)
-    .eq('user_id', req.user.id)
-    .single()
-
+  const session = sessionQueries.findById.get(req.params.id, req.user.id)
   if (!session) return res.status(404).json({ error: 'Session not found' })
 
-  await db
-    .from('sessions')
-    .update({ completed: true, completed_at: new Date().toISOString() })
-    .eq('id', session.id)
+  sessionQueries.complete.run(session.id)
 
-  // Get updated vocab stats
-  const { data: words } = await db
-    .from('words')
-    .select('word, translation, confidence, status')
-    .eq('user_id', req.user.id)
-    .in('word', session.words_encountered || [])
-
-  // Check if user should advance stage
-  const { data: allWords } = await db
-    .from('words')
-    .select('confidence, status')
-    .eq('user_id', req.user.id)
-
-  const { data: profile } = await db
-    .from('user_profiles')
-    .select('current_stage, current_city, current_episode')
-    .eq('id', req.user.id)
-    .single()
-
-  const acquiredWords = (allWords || []).filter((w) => w.status === 'acquired')
+  const wordsEncountered = JSON.parse(session.words_encountered || '[]')
+  const allWords = wordQueries.findAll.all(req.user.id)
+  const sessionWords = allWords.filter((w) => wordsEncountered.includes(w.word))
+  const acquiredWords = allWords.filter((w) => w.status === 'acquired')
   const totalConfidence = acquiredWords.reduce((sum, w) => sum + w.confidence, 0)
 
-  // Update user episode progress
+  const profile = profileQueries.findById.get(req.user.id)
   const nextEpisode = Math.max(session.episode + 1, profile?.current_episode || 1)
-  await db
-    .from('user_profiles')
-    .update({ current_episode: nextEpisode })
-    .eq('id', req.user.id)
+  profileQueries.updateEpisode.run(nextEpisode, req.user.id)
 
   res.json({
     completed: true,
-    wordsEncountered: words || [],
+    wordsEncountered: sessionWords,
     totalConfidence,
     nextEpisode,
   })
 })
 
-// POST /api/session/onboarding/scene/:n — onboarding tutorial scenes
+// POST /api/session/onboarding/scene/:n
 router.post('/onboarding/scene/:n', requireAuth, async (req, res) => {
   const sceneIndex = parseInt(req.params.n)
   const { previousResponses } = req.body || {}
-
   try {
     const scene = await generateOnboardingScene(sceneIndex, previousResponses || [])
     res.json(scene)
