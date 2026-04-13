@@ -1,0 +1,30 @@
+{
+  "city": "madrid",
+  "episode": 2,
+  "title": "El Metro",
+  "subtitle": "The Subway",
+  "premise": "You need to get from the airport to your hotel in Malasaña. The metro map looks like a spider's web. You take the wrong line and end up somewhere completely unexpected in the old city.",
+  "setting": "Madrid Metro system. Starts at Aeropuerto T4 station, ends up at Gran Vía by mistake. Long fluorescent corridors, the smell of warm air from the tunnels.",
+  "characters": [
+    {
+      "id": "metro_worker",
+      "name": "Carmen",
+      "role": "Metro information booth worker",
+      "personality": "Brisk, seen it all before, but warms up when travelers try their Spanish",
+      "voiceId": "MADRID_ELENA_VOICE_ID"
+    },
+    {
+      "id": "commuter",
+      "name": "Javier",
+      "role": "Daily commuter, mid-30s, reads his phone constantly",
+      "personality": "Distracted but ultimately helpful when someone genuinely needs it",
+      "voiceId": "MADRID_MIGUEL_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "línea", "cambio", "dirección", "parada", "billete", "mapa",
+    "izquierda", "derecha", "tren", "siguiente"
+  ],
+  "sceneCount": 6,
+  "arc": "Lost at the information booth → Carmen explains (confusingly) → You get on the wrong train → Javier notices your confusion → He walks you to the right platform → You arrive, shake hands"
+}

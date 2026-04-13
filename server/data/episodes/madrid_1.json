@@ -1,0 +1,30 @@
+{
+  "city": "madrid",
+  "episode": 1,
+  "title": "Llegada",
+  "subtitle": "Arrival",
+  "premise": "You've just landed at Barajas airport. Your bag didn't arrive. You need to find the lost luggage office, but the signs are confusing and your phone is dead.",
+  "setting": "Madrid Barajas International Airport, Terminal 4, baggage claim area. The carousel is empty. Other passengers have gone. You stand there alone.",
+  "characters": [
+    {
+      "id": "airport_agent",
+      "name": "Elena",
+      "role": "Airline customer service agent",
+      "personality": "Efficient, slightly impatient, but kind when she realizes you're struggling",
+      "voiceId": "MADRID_ELENA_VOICE_ID"
+    },
+    {
+      "id": "fellow_traveler",
+      "name": "Miguel",
+      "role": "A fellow passenger who sees you struggling",
+      "personality": "Friendly, patient, speaks slowly when he sees you don't understand",
+      "voiceId": "MADRID_MIGUEL_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "maleta", "perdida", "ayuda", "dónde", "por favor", "gracias",
+    "equipaje", "oficina", "vuelo", "nombre"
+  ],
+  "sceneCount": 6,
+  "arc": "Confusion at empty carousel → Elena notices you → Misunderstanding about your bag → Miguel steps in to help → Office visit together → Case resolved, first connection made"
+}

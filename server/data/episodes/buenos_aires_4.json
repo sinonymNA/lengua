@@ -1,0 +1,30 @@
+{
+  "city": "buenos-aires",
+  "episode": 4,
+  "title": "El Tango",
+  "subtitle": "The Dance",
+  "premise": "A milonga in San Telmo. You wander in. An instructor sees you watching from the wall and the invitation to dance is not really optional. Tango has its own language, and you're expected to speak it.",
+  "setting": "A milonga in a 1920s salon in San Telmo. Soft amber light, wooden floors polished by decades of shoes, a live orchestra in the corner, couples moving like they share one breath.",
+  "characters": [
+    {
+      "id": "instructor",
+      "name": "Elena",
+      "role": "Tango instructor, danced professionally for 20 years",
+      "personality": "Elegant, precise, speaks about dance the way others speak about religion",
+      "voiceId": "BUENOS_AIRES_VALENTINA_VOICE_ID"
+    },
+    {
+      "id": "musician",
+      "name": "Gustavo",
+      "role": "Lead bandoneon player",
+      "personality": "Barely speaks, communicates entirely through music and expression, but when he does speak it matters",
+      "voiceId": "BUENOS_AIRES_RODRIGO_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "bailar", "sentir", "abrazo", "ritmo", "escuchar", "mover",
+    "cuerpo", "pareja", "música", "juntos"
+  ],
+  "sceneCount": 6,
+  "arc": "Watching from the wall → Elena approaches and invites → First awkward steps → Gustavo plays something slower → You start to feel it → A brief moment of real connection on the floor"
+}

@@ -1,0 +1,30 @@
+{
+  "city": "madrid",
+  "episode": 3,
+  "title": "El Mercado",
+  "subtitle": "The Market",
+  "premise": "You've found Mercado de San Miguel, the famous covered market near Plaza Mayor. You're hungry and everything smells incredible. Navigating vendors, prices, and pointing at things you can't name.",
+  "setting": "Mercado de San Miguel, a beautiful 1916 iron-and-glass market hall. Vendors in white aprons. The smell of jamón, fresh bread, and wine. Tourists and locals mixing.",
+  "characters": [
+    {
+      "id": "vendor",
+      "name": "Rosa",
+      "role": "Cheese and jamón vendor, has run her stall for 20 years",
+      "personality": "Proud of her products, likes to educate customers, generous with samples",
+      "voiceId": "MADRID_ELENA_VOICE_ID"
+    },
+    {
+      "id": "chef",
+      "name": "Pablo",
+      "role": "Young tapas chef at a stand near the back",
+      "personality": "Enthusiastic, fast-talking, loves it when foreigners try Spanish food",
+      "voiceId": "MADRID_MIGUEL_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "queso", "jamón", "cuánto", "cuesta", "uno", "dos", "kilo",
+    "probar", "rico", "por favor"
+  ],
+  "sceneCount": 6,
+  "arc": "Arriving and being overwhelmed → Rosa offers a sample → Misunderstanding the price → Pablo helps translate → Ordering successfully → Eating together at the counter, first real conversation"
+}

@@ -1,0 +1,23 @@
+{
+  "city": "buenos-aires",
+  "episode": 3,
+  "title": "La Feria",
+  "subtitle": "The Market",
+  "premise": "San Telmo Sunday market. You find an antique dealer with a beautiful old map you want to buy. But he wants to negotiate, refuses to give a fixed price, and the whole interaction is a theater performance.",
+  "setting": "San Telmo open-air feria, a Sunday tradition. Cobblestone streets lined with antiques, old books, leather goods, tango dancers performing nearby.",
+  "characters": [
+    {
+      "id": "dealer",
+      "name": "Horacio",
+      "role": "Antique dealer, former schoolteacher, deep Buenos Aires old-money culture",
+      "personality": "Theatrical, dramatic about prices, genuinely loves his objects and the stories behind them",
+      "voiceId": "BUENOS_AIRES_RODRIGO_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "precio", "caro", "barato", "regatear", "oferta", "mapa",
+    "antiguo", "interesante", "pensarlo", "trato"
+  ],
+  "sceneCount": 6,
+  "arc": "Finding the map → Horacio's opening monologue about its history → First price negotiation → Counter offer → Dramatic acceptance → Wrapping the map, personal story about its origin"
+}

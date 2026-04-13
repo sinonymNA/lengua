@@ -1,0 +1,30 @@
+{
+  "city": "mexico-city",
+  "episode": 1,
+  "title": "El Aeropuerto",
+  "subtitle": "The Airport",
+  "premise": "You land at Aeropuerto Internacional Benito Juárez. Customs is a maze of red and green lights, officials with clipboards, and questions you don't understand. Your declaration form has a mistake.",
+  "setting": "AICM Terminal 1, international arrivals. Long lines, the smell of industrial cleaner, officials in beige uniforms. The tension of not knowing if you've done something wrong.",
+  "characters": [
+    {
+      "id": "customs_officer",
+      "name": "Sofía",
+      "role": "Customs and immigration officer",
+      "personality": "Professional, precise, but has a warm side she rarely shows on duty",
+      "voiceId": "MEXICO_SOFIA_VOICE_ID"
+    },
+    {
+      "id": "traveler",
+      "name": "Carlos",
+      "role": "Mexican-American returning home, speaks both languages",
+      "personality": "Casual, immediately friendly, offers help without being asked",
+      "voiceId": "MEXICO_CARLOS_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "pasaporte", "declaración", "nada", "declarar", "destino",
+    "hotel", "días", "trabajo", "turismo", "firmar"
+  ],
+  "sceneCount": 6,
+  "arc": "Red light at customs → Sofía asks questions → Confusion about the form → Carlos steps in to explain → Form corrected → Waved through, Carlos gives city tips"
+}

@@ -1,0 +1,30 @@
+{
+  "city": "madrid",
+  "episode": 5,
+  "title": "La Cena",
+  "subtitle": "Dinner",
+  "premise": "Your last night in Madrid. You've found a small restaurant off the tourist trail. The menu is entirely in Spanish and you have a food allergy. Plus the waiter speaks no English and is very proud of that fact.",
+  "setting": "A small, family-run restaurant in Lavapiés. Checkered tablecloths, framed photos of Real Madrid, the owner watching a match on a small TV behind the bar.",
+  "characters": [
+    {
+      "id": "waiter",
+      "name": "Diego",
+      "role": "Waiter and co-owner, has worked here since he was 14",
+      "personality": "Playful, mildly dramatic, speaks only Spanish and is amused by your attempts",
+      "voiceId": "MADRID_MIGUEL_VOICE_ID"
+    },
+    {
+      "id": "diner",
+      "name": "Lucía",
+      "role": "Regular customer at the neighboring table, doctor",
+      "personality": "Quietly observant, offers to help once she sees you struggling, speaks careful Spanish when helping",
+      "voiceId": "MADRID_ELENA_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "menu", "alergia", "sin", "gluten", "pollo", "pescado", "agua",
+    "vino", "delicioso", "cuenta"
+  ],
+  "sceneCount": 6,
+  "arc": "Studying the menu in panic → Diego arrives, amused → Attempting to explain your allergy → Lucía intervenes → Order successfully placed → A toast at the end, feel like you belong"
+}

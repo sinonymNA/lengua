@@ -1,0 +1,23 @@
+{
+  "city": "buenos-aires",
+  "episode": 2,
+  "title": "El Colectivo",
+  "subtitle": "The Bus",
+  "premise": "You take a colectivo (local bus) from San Telmo toward Palermo. The exact change system, the hand signals, the stops with no signs — it's a test. You end up one neighborhood too far.",
+  "setting": "Buenos Aires public bus, Line 24. Standing room only, lurching around corners, cumbia playing from someone's phone, the driver arguing cheerfully with a regular.",
+  "characters": [
+    {
+      "id": "bus_driver",
+      "name": "Don Jorge",
+      "role": "Veteran colectivo driver, has driven this route for 22 years",
+      "personality": "Gruff exterior, actually kind, has soft spot for confused foreigners",
+      "voiceId": "BUENOS_AIRES_RODRIGO_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "colectivo", "moneda", "bajarse", "parada", "siguiente", "cuadras",
+    "esquina", "doblar", "caminar", "gracias"
+  ],
+  "sceneCount": 6,
+  "arc": "Getting on without exact change → Jorge explains the system → You overshoot your stop → Jorge tells you loudly you've gone too far → Walk-off instructions → You find your way, he honks as he passes"
+}

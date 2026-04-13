@@ -1,0 +1,23 @@
+{
+  "city": "mexico-city",
+  "episode": 5,
+  "title": "La Lluvia",
+  "subtitle": "The Rain",
+  "premise": "Mexico City's sudden afternoon rainstorm catches you completely off guard on Avenida Ámsterdam. You sprint into the nearest café. Inside, it's warm and full of regulars who all seem to know each other.",
+  "setting": "A small café in Colonia Condesa. Tiled floors, the sound of rain on the windows, cumbia playing softly, the smell of café de olla and pan dulce.",
+  "characters": [
+    {
+      "id": "barista",
+      "name": "Valentina",
+      "role": "Café owner and barista, born in Oaxaca, has lived in CDMX for 15 years",
+      "personality": "Warm, philosophical, treats her café like a living room",
+      "voiceId": "MEXICO_SOFIA_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "lluvia", "mojado", "café", "caliente", "frío", "sentarse",
+    "esperar", "quedar", "afuera", "ciudad"
+  ],
+  "sceneCount": 6,
+  "arc": "Bursting in soaking wet → Valentina laughs and gets you a towel → Ordering something warm → She asks where you're from → You have your first real conversation → The rain stops, she sends you off with a pastry"
+}

@@ -1,0 +1,30 @@
+{
+  "city": "buenos-aires",
+  "episode": 1,
+  "title": "El Puerto",
+  "subtitle": "The Port",
+  "premise": "You arrive at Puerto Madero by boat from Montevideo. The dock is chaotic. You need to get your bag checked by port authority and find the exit to the city, but Argentine bureaucracy is its own language.",
+  "setting": "Puerto Madero waterfront, Buenos Aires. Modern gleaming towers alongside old red-brick warehouses. The wide brown Río de la Plata, seagulls, the smell of diesel and river water.",
+  "characters": [
+    {
+      "id": "dock_worker",
+      "name": "Rodrigo",
+      "role": "Port authority worker, former merchant sailor",
+      "personality": "Authoritative on paper, actually very friendly, speaks with a thick Rioplatense accent",
+      "voiceId": "BUENOS_AIRES_RODRIGO_VOICE_ID"
+    },
+    {
+      "id": "tourist",
+      "name": "Valentina",
+      "role": "Argentine architect returning from Montevideo",
+      "personality": "Sophisticated, quick-witted, patient teacher once she decides to help you",
+      "voiceId": "BUENOS_AIRES_VALENTINA_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "bolso", "salida", "documento", "revisión", "bienvenido", "ciudad",
+    "porteño", "colectivo", "barrio", "cómo"
+  ],
+  "sceneCount": 6,
+  "arc": "Docking confusion → Rodrigo asks for documents → Paperwork problem → Valentina intervenes with charm → Documents sorted → Valentina offers to share a taxi into the city"
+}

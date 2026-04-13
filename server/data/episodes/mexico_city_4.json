@@ -1,0 +1,23 @@
+{
+  "city": "mexico-city",
+  "episode": 4,
+  "title": "El Parque",
+  "subtitle": "The Park",
+  "premise": "Sunday afternoon in Bosque de Chapultepec. A kids' soccer game is happening and their ball rolls directly into your leg. Suddenly you're involved whether you like it or not.",
+  "setting": "A grass clearing in Chapultepec park on a sunny Sunday. Families with picnics, a makeshift soccer goal made of backpacks, the smell of elotes and tamarindo.",
+  "characters": [
+    {
+      "id": "coach",
+      "name": "Roberto",
+      "role": "Volunteer soccer coach, neighborhood dad",
+      "personality": "Enthusiastic, competitive about kids' soccer, surprisingly patient with strangers",
+      "voiceId": "MEXICO_CARLOS_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "pelota", "jugar", "equipo", "gol", "correr", "pasar",
+    "bien", "otra vez", "vamos", "perdón"
+  ],
+  "sceneCount": 6,
+  "arc": "Ball hits you → Roberto apologizes and invites you to join → First fumbling attempt at Spanish communication → You score a goal → Celebration → Roberto invites you to come back next Sunday"
+}

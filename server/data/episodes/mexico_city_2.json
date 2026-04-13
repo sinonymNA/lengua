@@ -1,0 +1,23 @@
+{
+  "city": "mexico-city",
+  "episode": 2,
+  "title": "El Uber",
+  "subtitle": "The Rideshare",
+  "premise": "You order an Uber to Colonia Roma. The driver is chatty, takes a different route, and you're not sure if you're going the wrong way or if there's just traffic. Also his phone is blasting norteño music.",
+  "setting": "Inside a beat-up silver Nissan navigating Mexico City traffic. The smell of pine air freshener and street food drifting through the window. Construction everywhere.",
+  "characters": [
+    {
+      "id": "uber_driver",
+      "name": "Memo",
+      "role": "Rideshare driver, also has a side business selling tamales",
+      "personality": "Extremely talkative, proud of his city, speaks rapid CDMX slang",
+      "voiceId": "MEXICO_CARLOS_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "tráfico", "ruta", "destino", "correcto", "equivocado", "aquí",
+    "esperar", "minutos", "cuánto", "tiempo"
+  ],
+  "sceneCount": 6,
+  "arc": "Getting in → Memo explains a detour → You misunderstand and panic → He reassures you → You practice small talk → Arriving at Roma, he tells you his tamale stand address"
+}

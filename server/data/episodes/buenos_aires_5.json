@@ -1,0 +1,30 @@
+{
+  "city": "buenos-aires",
+  "episode": 5,
+  "title": "La Despedida",
+  "subtitle": "The Farewell",
+  "premise": "Your last morning. The airport in two hours. You sit in a café on Avenida Corrientes and the city plays back like a film. Some of the people you've met throughout the journey appear one last time.",
+  "setting": "A classic Buenos Aires café on Corrientes, the street that never sleeps. Morning light through the windows, espresso, the newspaper, the sound of the city waking up.",
+  "characters": [
+    {
+      "id": "dock_worker",
+      "name": "Rodrigo",
+      "role": "He happens to be at the next table — lives in the neighborhood",
+      "personality": "Softer now, nostalgic, speaks slowly like someone saying goodbye at a train station",
+      "voiceId": "BUENOS_AIRES_RODRIGO_VOICE_ID"
+    },
+    {
+      "id": "tourist",
+      "name": "Valentina",
+      "role": "Passing by on her way to work, stops when she sees you",
+      "personality": "Warm, a little emotional at goodbyes, speaks more personally than before",
+      "voiceId": "BUENOS_AIRES_VALENTINA_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "recordar", "volver", "extrañar", "ciudad", "aprender", "idioma",
+    "adiós", "hasta", "siempre", "gracias"
+  ],
+  "sceneCount": 6,
+  "arc": "Sitting alone → Rodrigo notices you → Reflecting on the journey together → Valentina joins briefly → They ask what you've learned → Final exchange, a real goodbye — in Spanish"
+}

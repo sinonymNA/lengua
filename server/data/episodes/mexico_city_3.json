@@ -1,0 +1,23 @@
+{
+  "city": "mexico-city",
+  "episode": 3,
+  "title": "La Tienda",
+  "subtitle": "The Store",
+  "premise": "An Oxxo convenience store at midnight. You need water, snacks, and ibuprofen. Your card keeps declining. There's a line of impatient people behind you.",
+  "setting": "Bright fluorescent Oxxo on Avenida Álvaro Obregón. Late night. The hum of refrigerators, the beeping of a barcode scanner, the quiet judgment of the person behind you in line.",
+  "characters": [
+    {
+      "id": "clerk",
+      "name": "Daniela",
+      "role": "Night shift clerk at Oxxo, college student",
+      "personality": "Tired but kind, has seen every possible tourist disaster, speaks carefully when she realizes you're struggling",
+      "voiceId": "MEXICO_SOFIA_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "efectivo", "tarjeta", "precio", "cobrar", "cambio", "agua",
+    "bolsa", "recibo", "pesos", "cuánto"
+  ],
+  "sceneCount": 6,
+  "arc": "Gathering items → Card declined → Daniela explains calmly → Trying to find cash → She helps count the money → Crisis resolved, she gives you a freebie for the stress"
+}

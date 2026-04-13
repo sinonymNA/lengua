@@ -1,0 +1,30 @@
+{
+  "city": "madrid",
+  "episode": 4,
+  "title": "Perdido",
+  "subtitle": "Lost",
+  "premise": "It's 11pm in La Latina neighborhood. The narrow streets all look the same. Your phone is dead again (always). You've been walking in circles for 20 minutes and need to find Calle Cava Baja.",
+  "setting": "La Latina neighborhood at night. Cobblestone streets, warm light from bars, the sound of conversation and guitar. A city fully awake at midnight.",
+  "characters": [
+    {
+      "id": "abuela",
+      "name": "Pilar",
+      "role": "Elderly local woman returning from visiting her sister",
+      "personality": "Sharp, funny, speaks in rapid Madrid slang but slows down when she takes pity on you",
+      "voiceId": "MADRID_ELENA_VOICE_ID"
+    },
+    {
+      "id": "taxi_driver",
+      "name": "Andrés",
+      "role": "Taxi driver parked outside a bar, eating a bocadillo",
+      "personality": "World-weary, dry humor, knows every street in Madrid",
+      "voiceId": "MADRID_MIGUEL_VOICE_ID"
+    }
+  ],
+  "targetVocabulary": [
+    "calle", "perdido", "ayuda", "aquí", "allí", "cerca", "lejos",
+    "derecho", "girar", "entender"
+  ],
+  "sceneCount": 6,
+  "arc": "Hopelessly lost → Pilar finds you looking confused → She gives directions (you understand nothing) → She calls Andrés over → Andrés gives simpler directions → You find the street, wave goodbye"
+}
